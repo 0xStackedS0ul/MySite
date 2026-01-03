@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>0xstackeds0ul Berserk</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:wght@400;600&display=swap');
+
+        body {
+            background-color: #0d0d0d;
+            color: #d1d1d1;
+            font-family: 'Cormorant Garamond', serif;
+            line-height: 1.6;
+            /* Дозволяємо прокрутку на body, щоб увімкнути скролінг */
+            overflow: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Стилі для кастомізації скролбару */
+        body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        body::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        body::-webkit-scrollbar-thumb {
+            background-color: #7b1d1d;
+            border-radius: 4px;
+        }
+
+        body::-webkit-scrollbar-thumb:hover {
+            background-color: #9e2a2a;
+        }
+
+        #canvas-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .container {
+            max-width: 450px;
+            margin: auto;
+            padding: 1rem;
+            z-index: 10;
+            position: relative;
+            animation: fadeIn 2s ease-in-out;
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+
+        .berserk-plate {
+            background-color: rgba(33, 33, 33, 0.8);
+            border: 2px solid #333333;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+            position: relative;
+            transition: all 0.3s ease;
+            border-radius: 12px;
+        }
+        .berserk-plate:hover {
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+            transform: translateY(-3px) scale(1.01);
+        }
+
+        .ascii-art {
+            white-space: pre-wrap;
+            line-height: 0.9;
+            color: #7b1d1d;
+            text-shadow: 0 0 5px #4a0f0f;
+        }
+        
+        .section-header {
+            font-family: 'Cinzel', serif;
+            color: #9e2a2a;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            display: inline-block;
+        }
+        .section-header::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -5px;
+            width: 100%;
+            height: 2px;
+            background-color: #9e2a2a;
+        }
+
+        .project-title {
+            font-family: 'Cinzel', serif;
+            color: #d1d1d1;
+            font-weight: 700;
+            font-size: 1.25rem; /* text-xl */
+            text-decoration: underline;
+        }
+
+        @media (min-width: 768px) {
+            .project-title {
+                font-size: 1.5rem; /* md:text-2xl */
+            }
+        }
+
+        .link-text {
+            color: #9e2a2a;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .link-text:hover {
+            color: #d1d1d1;
+        }
+        
+        .content-text {
+            color: #a0a0a0;
+            font-size: 0.875rem; /* Змінено з 0.75rem для мобільних */
+        }
+
+        @media (min-width: 768px) {
+            .content-text {
+                font-size: 1.3rem; /* Змінено з 1.4rem для десктопів */
+            }
+        }
+
+        .link-button {
+            display: inline-block;
+            background-color: #7b1d1d;
+            color: #d1d1d1;
+            padding: 0.25rem 0.5rem; /* Even smaller padding */
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-family: 'Cinzel', serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            font-size: 0.75rem; /* text-xs */
+        }
+        .link-button:hover {
+            background-color: #9e2a2a;
+            box-shadow: 0 0 8px rgba(158, 42, 42, 0.6);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Стилі для графіків */
+        .berserk-plate canvas {
+            background-color: transparent;
+            width: 100%;
+            height: 150px;
+            margin-bottom: 1rem;
+        }
+        
+        @media (min-width: 768px) {
+            .link-text {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas-bg"></canvas>
+    <div class="container">
+        <div class="berserk-plate text-center">
+            <pre class="ascii-art text-xs mb-8">
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⡈⣿⡟⡜⢰⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⡧⠈⡇⠁⠸⠉⠙⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⠀⠀⠀⠆⠀⠀⠈⠀⠹⠿⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⡃⢸⠀⠀⠂⠉⠉⠐⠒⠈⠉⠀⠀⠉⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣇⣜⡀⠀⠀⠀⠀⢀⠤⠒⠒⠒⢦⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⣿⣇⠀⠀⠀⠀⠀⣀⣀⣀⡐⢤⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀⠀⠀⠀⠁⠀⢀⢈⡀⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⣿⢫⠅⠀⠀⠂⢀⠀⠀⠀⠠⢌⣙⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⡟⠒⠁⠀⣼⠀⢸⠀⠀⢈⡁⠒⢬⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⠁⠀⢀⣈⠀⠀⢸⠀⠀⠠⠄⣉⠒⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⠴⠊⠡⠒⠑⡀⠘⠢⠤⢤⣀⡀⠙⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⠿⠿⠟⠉⠀⠀⠀⠀⢀⣠⠃⠀⢀⠠⠀⢸⣿⣦⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⢃⠀⠀⠀⡠⠀⠀⠀⠈⢀⣀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣶⣾⣿⡶⠒⠒⠂⠐⠀⠀⡀⠔⠑⠺⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⡿⠀⠠⠂⠀⠀⠀⠀⠁⠀⠀⠐⢤⣄⡈⠉⠛⠻⢿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⡿⢡⠁⠀⠀⠀⠀⢠⠀⠀⠂⠀⠀⢀⣿⣿⣿⣷⣦⣤⣀⠉⠛⠻⢿⣿⣿
+⣿⣿⣿⣿⠁⠇⠀⠀⠈⠀⠀⡘⠀⠀⠀⠀⠀⠈⣾⣿⣿⣿⣿⣿⣿⣿⣷⣦⣄⡈⠙
+⣿⣿⣿⣿⢀⠤⠤⠤⠤⠀⠀⠇⠀⠀⠀⠄⠀⠀⣹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⡇⢸⠀⠀⠀⠀⠀⢰⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⡏⠉⠉⠉⠁⠀⡼⠀⠀⠀⠀⠐⠀⠒⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+            </pre>
+            <h1 class="text-3xl font-bold mb-2 section-header">0xstackeds0ul</h1>
+            <p class="text-sm content-text">Welcome to my dark, iron reality.</p>
+        </div>
+
+        <div class="berserk-plate">
+            <h2 class="text-xl section-header mb-4">Projects</h2>
+            <canvas id="projects-graph"></canvas>
+            <div class="space-y-6 mt-8">
+                <div class="p-4 rounded-lg border border-gray-600">
+                    <h3 class="project-title">0xStackedS0ul_Server</h3>
+                    <p class="text-xs md:text-base mt-1 content-text">A considerable amount of time has passed since I conceived this idea. At first, I was faced with the problem of not having a server for my work. Then, one day, I remembered my old laptop from 2016-2017 and decided to build a server on it. The problems began immediately because it lacked a storage drive. I solved this with a flash drive, creating a bootable Ubuntu server installation. This allowed me to resolve the storage issue and give the project a second life. I bought my own domain, and it took me almost two months to build the server to launch this page and future projects. I started by familiarizing myself with protocols, redirection, DNS, console input, and the various commands that exist. This is not to mention the hours of errors and the need to purchase additional components for it to become what it is today. It was a long journey where AI did not guarantee success or, more importantly, the completion of this path. But looking back, I see how many times I could have given up on everything, yet I clung to that small part of the project's essence and pushed forward. As a result, it worked, and I will continue to improve both myself and my projects.
+                    </p>
+                </div>
+                <div class="p-4 rounded-lg border border-gray-600">
+                    <div class="flex items-center space-x-2">
+                        <h3 class="project-title">SignumLineify</h3>
+                        <a href="https://www.deviantart.com/signumlineify" target="_blank" class="link-button">Link</a>
+                    </div>
+                    <p class="text-xs md:text-base mt-1 content-text">The backstory of this project began with a sunset I was watching. It made me reflect on what could be created, and the injustice that people see many things as dots, when in reality, they are infinite lines. As I watched the sunset and the clouds, I thought it would be cool to transform everything into lines broken into parts based on their dominant color. I walked home with a single thought of how and where to do this. At that time, I didn't even have access to a PC, but I decided to take action despite everything. I launched the first piece of code in Google Colab, and I loved the result. I worked until 3 AM creating images in my linear style, but then I started to doubt whether it was something new or just old and forgotten. In the end, I decided that this was a new effect on this scale. It's not a glitch effect; it's an ordered one. That’s what the AI told me when I asked if anything similar existed. To date, over 2.5 thousand people have viewed the images, and more than 30 have added some to their favorites. This project will continue to exist as a reflection of its history.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="berserk-plate">
+            <h2 class="text-xl section-header mb-8">Contacts</h2>
+            <canvas id="contacts-graph"></canvas>
+            <div class="space-y-4 text-sm mt-8">
+                <p>
+                    <span class="font-bold content-text">Email:</span> <a href="mailto:oleksandrkonopko@ieu.edu.ua" class="link-text">oleksandrkonopko@ieu.edu.ua</a>
+                </p>
+                <p>
+                    <span class="font-bold content-text">GitHub:</span> <a href="https://github.com/0xStackedS0ul" target="_blank" class="link-text">0xstackeds0ul</a>
+                </p>
+                <p>
+                    <span class="font-bold content-text">Instagram:</span> <a href="https://www.instagram.com/0xstackeds0ul/" target="_blank" class="link-text">0xstackeds0ul</a>
+                </p>
+                <p>
+                    <span class="font-bold content-text">Chess.com:</span> <a href="https://www.chess.com/member/0xstackeds0ul" target="_blank" class="link-text">0xstackeds0ul</a>
+                </p>
+            </div>
+        </div>
+        
+        <footer class="mt-8 pt-4">
+            <p class="text-xs text-gray-500 text-center">
+                // 2025 0xstackeds0ul
+            </p>
+        </footer>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('canvas-bg');
+            const ctx = canvas.getContext('2d');
+            let width, height;
+            let particles = [];
+            let mouse = { x: 0, y: 0 };
+            let projectsCanvas, contactsCanvas, projectsCtx, contactsCtx;
+
+            function resizeCanvas() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+                
+                // Оновлення розмірів графіків при зміні розміру вікна
+                projectsCanvas.width = projectsCanvas.clientWidth;
+                projectsCanvas.height = projectsCanvas.clientHeight;
+                contactsCanvas.width = contactsCanvas.clientWidth;
+                contactsCanvas.height = contactsCanvas.clientHeight;
+            }
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * width;
+                    this.y = Math.random() * height;
+                    this.vx = (Math.random() - 0.5) * 0.5;
+                    this.vy = (Math.random() - 0.5) * 0.5;
+                    this.radius = 1;
+                    this.color = '#9e2a2a'; // Matching link color
+                }
+
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+
+                    if (this.x < 0 || this.x > width) this.vx *= -1;
+                    if (this.y < 0 || this.y > height) this.vy *= -1;
+                }
+
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                }
+            }
+
+            function initParticles() {
+                particles = [];
+                // Check device screen width to adjust particle count
+                let particleCount = 250;
+                if (window.innerWidth < 768) { 
+                    particleCount = 50; 
+                }
+                for (let i = 0; i < particleCount; i++) { 
+                    particles.push(new Particle());
+                }
+            }
+
+            function connectParticles() {
+                for (let a = 0; a < particles.length; a++) {
+                    for (let b = a; b < particles.length; b++) {
+                        let distance = Math.sqrt(Math.pow(particles[a].x - particles[b].x, 2) + Math.pow(particles[a].y - particles[b].y, 2));
+                        if (distance < 150) {
+                            ctx.beginPath();
+                            ctx.strokeStyle = `rgba(158, 42, 42, ${1 - distance / 150})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.moveTo(particles[a].x, particles[a].y);
+                            ctx.lineTo(particles[b].x, particles[b].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+            
+            // Нові елементи Canvas для графіків
+            projectsCanvas = document.getElementById('projects-graph');
+            contactsCanvas = document.getElementById('contacts-graph');
+            projectsCtx = projectsCanvas.getContext('2d');
+            contactsCtx = contactsCanvas.getContext('2d');
+
+            // Функція для малювання стовпчикового графіка (Проєкти)
+            function drawProjectsGraph(ctx, width, height, baseColor) {
+                if (width === 0 || height === 0) return;
+                ctx.clearRect(0, 0, width, height);
+                ctx.strokeStyle = 'rgba(68, 68, 68, 0.4)';
+                ctx.lineWidth = 1;
+                for (let i = 0; i <= 10; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, i * height / 10);
+                    ctx.lineTo(width, i * height / 10);
+                    ctx.stroke();
+                }
+
+                const barWidth = 3;
+                const gap = 2;
+                const numBars = Math.floor(width / (barWidth + gap));
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = baseColor;
+                
+                for (let i = 0; i < numBars; i++) {
+                    const x = i * (barWidth + gap);
+                    let closestParticle = null;
+                    let minDistance = Infinity;
+                    for (const particle of particles) {
+                        const distance = Math.abs(particle.x - (x + barWidth / 2));
+                        if (distance < minDistance) {
+                            minDistance = distance;
+                            closestParticle = particle;
+                        }
+                    }
+                    let barHeight = height * 0.5;
+                    if (closestParticle) {
+                        barHeight = (height - closestParticle.y) * 0.5 + height * 0.2;
+                    }
+                    
+                    const y = height - barHeight;
+                    const gradient = ctx.createLinearGradient(0, y, 0, height);
+                    gradient.addColorStop(0, baseColor);
+                    gradient.addColorStop(1, 'rgba(0,0,0,0)');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(x, y, barWidth, barHeight);
+                }
+                ctx.shadowBlur = 0;
+            }
+
+            // Функція для малювання "мережевого" графіка (Контакти)
+            let contactsParticles = [];
+            function initContactsParticles(width, height) {
+                contactsParticles = [];
+                // Динамічне налаштування кількості частинок для графіку контактів
+                let contactsParticleCount = 50;
+                if (window.innerWidth < 768) {
+                    contactsParticleCount = 25; // Менше частинок для мобільних
+                }
+                
+                for (let i = 0; i < contactsParticleCount; i++) {
+                    contactsParticles.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        vx: (Math.random() - 0.5) * 0.5,
+                        vy: (Math.random() - 0.5) * 0.5
+                    });
+                }
+            }
+
+            function drawContactsGraph(ctx, width, height, baseColor) {
+                if (width === 0 || height === 0) return;
+                ctx.clearRect(0, 0, width, height);
+
+                // Намалювати сітку
+                ctx.strokeStyle = 'rgba(68, 68, 68, 0.4)';
+                ctx.lineWidth = 1;
+                for (let i = 0; i <= 10; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, i * height / 10);
+                    ctx.lineTo(width, i * height / 10);
+                    ctx.stroke();
+                }
+
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = baseColor;
+
+                contactsParticles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    if (p.x < 0 || p.x > width) p.vx *= -1;
+                    if (p.y < 0 || p.y > height) p.vy *= -1;
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+                    ctx.fillStyle = baseColor;
+                    ctx.fill();
+                });
+                
+                for (let a = 0; a < contactsParticles.length; a++) {
+                    for (let b = a; b < contactsParticles.length; b++) {
+                        let distance = Math.sqrt(Math.pow(contactsParticles[a].x - contactsParticles[b].x, 2) + Math.pow(contactsParticles[a].y - contactsParticles[b].y, 2));
+                        if (distance < 70) {
+                            ctx.beginPath();
+                            ctx.strokeStyle = `rgba(123, 29, 29, ${1 - distance / 70})`;
+                            ctx.lineWidth = 1;
+                            ctx.moveTo(contactsParticles[a].x, contactsParticles[a].y);
+                            ctx.lineTo(contactsParticles[b].x, contactsParticles[b].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+                
+                ctx.shadowBlur = 0;
+            }
+
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                ctx.clearRect(0, 0, width, height); 
+                connectParticles();
+                particles.forEach(p => {
+                    p.update();
+                    p.draw();
+                });
+                
+                // Малювання графіків без оновлення розмірів у кожному кадрі
+                drawProjectsGraph(projectsCtx, projectsCanvas.width, projectsCanvas.height, '#9e2a2a');
+                drawContactsGraph(contactsCtx, contactsCanvas.width, contactsCanvas.height, '#7b1d1d');
+            }
+            
+            window.addEventListener('resize', () => {
+                resizeCanvas();
+                initParticles(); // Re-initialize particles on resize
+                initContactsParticles(contactsCanvas.clientWidth, contactsCanvas.clientHeight);
+            });
+
+            // Initial setup
+            resizeCanvas();
+            initParticles();
+            initContactsParticles(contactsCanvas.clientWidth, contactsCanvas.clientHeight);
+            animate();
+        });
+    </script>
+</body>
+</html>
